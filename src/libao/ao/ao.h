@@ -1,8 +1,8 @@
 /*
  *
- *  ao.h 
+ *  ao.h
  *
- *	Original Copyright (C) Aaron Holtzman - May 1999
+ *    Original Copyright (C) Aaron Holtzman - May 1999
  *      Modifications Copyright (C) Stan Seibert - July 2000, July 2001
  *      More Modifications Copyright (C) Jack Moffitt - October 2000
  *
@@ -62,32 +62,32 @@ extern "C"
 /* --- Structures --- */
 
 typedef struct ao_info {
-	int  type; /* live output or file output? */
-	char *name; /* full name of driver */
-	char *short_name; /* short name of driver */
+    int  type; /* live output or file output? */
+    char *name; /* full name of driver */
+    char *short_name; /* short name of driver */
         char *author; /* driver author */
-	char *comment; /* driver comment */
-	int  preferred_byte_format;
-	int  priority;
-	char **options;
-	int  option_count;
+    char *comment; /* driver comment */
+    int  preferred_byte_format;
+    int  priority;
+    char **options;
+    int  option_count;
 } ao_info;
 
 typedef struct ao_functions ao_functions;
 typedef struct ao_device ao_device;
 
 typedef struct ao_sample_format {
-	int  bits; /* bits per sample */
-	int  rate; /* samples per second (in a single channel) */
-	int  channels; /* number of audio channels */
-	int  byte_format; /* Byte ordering in sample, see constants below */
+    int  bits; /* bits per sample */
+    int  rate; /* samples per second (in a single channel) */
+    int  channels; /* number of audio channels */
+    int  byte_format; /* Byte ordering in sample, see constants below */
         char *matrix; /* input channel location/ordering */
 } ao_sample_format;
 
 typedef struct ao_option {
-	char *key;
-	char *value;
-	struct ao_option *next;
+    char *key;
+    char *value;
+    struct ao_option *next;
 } ao_option;
 
 #if defined(AO_BUILDING_LIBAO)

@@ -36,70 +36,70 @@ static char *ao_null_options[] = {
   "debug","verbose","matrix","quiet"
 };
 static ao_info ao_null_info = {
-	AO_TYPE_LIVE,
-	"Null output",
-	"null",
-	"Stan Seibert <volsung@asu.edu>",
-	"This driver does nothing.",
-	AO_FMT_NATIVE,
-	0,
-	ao_null_options,
+    AO_TYPE_LIVE,
+    "Null output",
+    "null",
+    "Stan Seibert <volsung@asu.edu>",
+    "This driver does nothing.",
+    AO_FMT_NATIVE,
+    0,
+    ao_null_options,
         sizeof(ao_null_options)/sizeof(*ao_null_options)
 };
 
 
 typedef struct ao_null_internal {
-	unsigned long byte_counter;
+    unsigned long byte_counter;
 } ao_null_internal;
 
 
 static int ao_null_test(void)
 {
-	return 1; /* Null always works */
+    return 1; /* Null always works */
 }
 
 
 static ao_info *ao_null_driver_info(void)
 {
-	return &ao_null_info;
+    return &ao_null_info;
 }
 
 
 static int ao_null_device_init(ao_device *device)
 {
-	ao_null_internal *internal;
+    ao_null_internal *internal;
 
-	internal = (ao_null_internal *) malloc(sizeof(ao_null_internal));
+    internal = (ao_null_internal *) malloc(sizeof(ao_null_internal));
 
-	if (internal == NULL)
-		return 0; /* Could not initialize device memory */
+    if (internal == NULL)
+        return 0; /* Could not initialize device memory */
 
-	internal->byte_counter = 0;
+    internal->byte_counter = 0;
 
-	device->internal = internal;
+    device->internal = internal;
         device->output_matrix_order = AO_OUTPUT_MATRIX_FIXED;
 
-	return 1; /* Memory alloc successful */
+    return 1; /* Memory alloc successful */
 }
 
 
 static int ao_null_set_option(ao_device *device, const char *key,
-			      const char *value)
+                  const char *value)
 {
-	/*ao_null_internal *internal = (ao_null_internal *) device->internal;*/
-	(void)value;
-	(void)key;
-	(void)device;
+    /*ao_null_internal *internal = (ao_null_internal *) device->internal;*/
+    (void)value;
+    (void)key;
+    (void)device;
 
-	return 1;
+    return 1;
 }
 
 
 
 static int ao_null_open(ao_device *device, ao_sample_format *format)
 {
-	/* Use whatever format the client requested */
-	device->driver_byte_format = device->client_byte_format;
+    /* Use whatever format the client requested */
+    device->driver_byte_format = device->client_byte_format;
 
         if(!device->inter_matrix){
           /* by default, we want inter == in */
@@ -107,47 +107,47 @@ static int ao_null_open(ao_device *device, ao_sample_format *format)
             device->inter_matrix = _strdup(format->matrix);
         }
 
-	return 1;
+    return 1;
 }
 
 
 static int ao_null_play(ao_device *device, const char *output_samples,
-			uint_32 num_bytes)
+            uint_32 num_bytes)
 {
-	ao_null_internal *internal = (ao_null_internal *)device->internal;
+    ao_null_internal *internal = (ao_null_internal *)device->internal;
 
-	internal->byte_counter += num_bytes;
+    internal->byte_counter += num_bytes;
 
-	return 1;
+    return 1;
 }
 
 
 static int ao_null_close(ao_device *device)
 {
-	ao_null_internal *internal = (ao_null_internal *) device->internal;
+    ao_null_internal *internal = (ao_null_internal *) device->internal;
 
-	adebug("%ld bytes sent to null device.\n", internal->byte_counter);
+    adebug("%ld bytes sent to null device.\n", internal->byte_counter);
 
-	return 1;
+    return 1;
 }
 
 
 static void ao_null_device_clear(ao_device *device)
 {
-	ao_null_internal *internal = (ao_null_internal *) device->internal;
+    ao_null_internal *internal = (ao_null_internal *) device->internal;
 
-	free(internal);
+    free(internal);
         device->internal=NULL;
 }
 
 
 ao_functions ao_null = {
-	ao_null_test,
-	ao_null_driver_info,
-	ao_null_device_init,
-	ao_null_set_option,
-	ao_null_open,
-	ao_null_play,
-	ao_null_close,
-	ao_null_device_clear
+    ao_null_test,
+    ao_null_driver_info,
+    ao_null_device_init,
+    ao_null_set_option,
+    ao_null_open,
+    ao_null_play,
+    ao_null_close,
+    ao_null_device_clear
 };

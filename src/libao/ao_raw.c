@@ -36,77 +36,77 @@
 static char *ao_raw_options[] = {"byteorder","matrix","verbose","quiet","debug"};
 static ao_info ao_raw_info =
 {
-	AO_TYPE_FILE,
-	"RAW sample output",
-	"raw",
-	"Stan Seibert <indigo@aztec.asu.edu>",
-	"Writes raw audio samples to a file",
-	AO_FMT_NATIVE,
-	0,
-	ao_raw_options,
+    AO_TYPE_FILE,
+    "RAW sample output",
+    "raw",
+    "Stan Seibert <indigo@aztec.asu.edu>",
+    "Writes raw audio samples to a file",
+    AO_FMT_NATIVE,
+    0,
+    ao_raw_options,
         sizeof(ao_raw_options)/sizeof(*ao_raw_options)
 };
 
 typedef struct ao_raw_internal
 {
-	int byte_order;
+    int byte_order;
 } ao_raw_internal;
 
 
 static int ao_raw_test(void)
 {
-	return 1; /* Always works */
+    return 1; /* Always works */
 }
 
 
 static ao_info *ao_raw_driver_info(void)
 {
-	return &ao_raw_info;
+    return &ao_raw_info;
 }
 
 
 static int ao_raw_device_init(ao_device *device)
 {
-	ao_raw_internal *internal;
+    ao_raw_internal *internal;
 
-	internal = (ao_raw_internal *) malloc(sizeof(ao_raw_internal));
+    internal = (ao_raw_internal *) malloc(sizeof(ao_raw_internal));
 
-	if (internal == NULL)
-		return 0; /* Could not initialize device memory */
+    if (internal == NULL)
+        return 0; /* Could not initialize device memory */
 
-	internal->byte_order = AO_FMT_NATIVE;
+    internal->byte_order = AO_FMT_NATIVE;
 
-	device->internal = internal;
+    device->internal = internal;
         device->output_matrix_order = AO_OUTPUT_MATRIX_FIXED;
 
-	return 1; /* Memory alloc successful */
+    return 1; /* Memory alloc successful */
 }
 
 static int ao_raw_set_option(ao_device *device, const char *key,
-			      const char *value)
+                  const char *value)
 {
-	ao_raw_internal *internal = (ao_raw_internal *)device->internal;
+    ao_raw_internal *internal = (ao_raw_internal *)device->internal;
 
-	if (!strcmp(key, "byteorder")) {
-		if (!strcmp(value, "native"))
-			internal->byte_order = AO_FMT_NATIVE;
-		else if (!strcmp(value, "big"))
-			internal->byte_order = AO_FMT_BIG;
-		else if (!strcmp(value, "little"))
-			internal->byte_order = AO_FMT_LITTLE;
-		else
-			return 0; /* Bad option value */
-	}
+    if (!strcmp(key, "byteorder")) {
+        if (!strcmp(value, "native"))
+            internal->byte_order = AO_FMT_NATIVE;
+        else if (!strcmp(value, "big"))
+            internal->byte_order = AO_FMT_BIG;
+        else if (!strcmp(value, "little"))
+            internal->byte_order = AO_FMT_LITTLE;
+        else
+            return 0; /* Bad option value */
+    }
 
-	return 1;
+    return 1;
 }
 
 
 static int ao_raw_open(ao_device *device, ao_sample_format *format)
 {
-	ao_raw_internal *internal = (ao_raw_internal *)device->internal;
+    ao_raw_internal *internal = (ao_raw_internal *)device->internal;
 
-	device->driver_byte_format = internal->byte_order;
+    device->driver_byte_format = internal->byte_order;
 
         //if(!device->inter_matrix){
         ///* by default, inter == in */
@@ -114,7 +114,7 @@ static int ao_raw_open(ao_device *device, ao_sample_format *format)
         //  device->inter_matrix = strdup(format->matrix);
         //}
 
-	return 1;
+    return 1;
 }
 
 
@@ -122,39 +122,39 @@ static int ao_raw_open(ao_device *device, ao_sample_format *format)
  * play the sample to the already opened file descriptor
  */
 static int ao_raw_play(ao_device *device, const char *output_samples,
-		       uint_32 num_bytes)
+               uint_32 num_bytes)
 {
-	if (fwrite(output_samples, sizeof(char), num_bytes,
-		   device->file) < num_bytes)
-		return 0;
-	else
-		return 1;
+    if (fwrite(output_samples, sizeof(char), num_bytes,
+           device->file) < num_bytes)
+        return 0;
+    else
+        return 1;
 }
 
 
 static int ao_raw_close(ao_device *device)
 {
-	/* No closeout needed */
-	return 1;
+    /* No closeout needed */
+    return 1;
 }
 
 
 static void ao_raw_device_clear(ao_device *device)
 {
-	ao_raw_internal *internal = (ao_raw_internal *) device->internal;
+    ao_raw_internal *internal = (ao_raw_internal *) device->internal;
 
-	free(internal);
+    free(internal);
         device->internal=NULL;
 }
 
 
 ao_functions ao_raw = {
-	ao_raw_test,
-	ao_raw_driver_info,
-	ao_raw_device_init,
-	ao_raw_set_option,
-	ao_raw_open,
-	ao_raw_play,
-	ao_raw_close,
-	ao_raw_device_clear
+    ao_raw_test,
+    ao_raw_driver_info,
+    ao_raw_device_init,
+    ao_raw_set_option,
+    ao_raw_open,
+    ao_raw_play,
+    ao_raw_close,
+    ao_raw_device_clear
 };

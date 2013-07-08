@@ -53,121 +53,121 @@
 
 /* Write a uint_32 in big-endian order. */
 #define WRITE_U32(buf, x) \
-	*(buf) = (unsigned char)(((x)>>24)&0xff);\
-	*((buf)+1) = (unsigned char)(((x)>>16)&0xff);\
-	*((buf)+2) = (unsigned char)(((x)>>8)&0xff);\
-	*((buf)+3) = (unsigned char)((x)&0xff);
+    *(buf) = (unsigned char)(((x)>>24)&0xff);\
+    *((buf)+1) = (unsigned char)(((x)>>16)&0xff);\
+    *((buf)+2) = (unsigned char)(((x)>>8)&0xff);\
+    *((buf)+3) = (unsigned char)((x)&0xff);
 
 typedef struct Audio_filehdr {
-	uint_32 magic; /* magic number */
-	uint_32 hdr_size; /* offset of the data */
-	uint_32 data_size; /* length of data (optional) */
-	uint_32 encoding; /* data format code */
-	uint_32 sample_rate; /* samples per second */
-	uint_32 channels; /* number of interleaved channels */
-	char info[4]; /* optional text information */
+    uint_32 magic; /* magic number */
+    uint_32 hdr_size; /* offset of the data */
+    uint_32 data_size; /* length of data (optional) */
+    uint_32 encoding; /* data format code */
+    uint_32 sample_rate; /* samples per second */
+    uint_32 channels; /* number of interleaved channels */
+    char info[4]; /* optional text information */
 } Audio_filehdr;
 
 static char *ao_au_options[] = {"matrix","verbose","quiet","debug"};
 static ao_info ao_au_info =
 {
-	AO_TYPE_FILE,
-	"AU file output",
-	"au",
-	"Wil Mahan <wtm2@duke.edu>",
-	"Sends output to a .au file",
-	AO_FMT_BIG,
-	0,
-	ao_au_options,
+    AO_TYPE_FILE,
+    "AU file output",
+    "au",
+    "Wil Mahan <wtm2@duke.edu>",
+    "Sends output to a .au file",
+    AO_FMT_BIG,
+    0,
+    ao_au_options,
         sizeof(ao_au_options)/sizeof(*ao_au_options)
 };
 
 typedef struct ao_au_internal
 {
-	Audio_filehdr au;
+    Audio_filehdr au;
 } ao_au_internal;
 
 
 static int ao_au_test(void)
 {
-	return 1; /* File driver always works */
+    return 1; /* File driver always works */
 }
 
 
 static ao_info *ao_au_driver_info(void)
 {
-	return &ao_au_info;
+    return &ao_au_info;
 }
 
 
 static int ao_au_device_init(ao_device *device)
 {
-	ao_au_internal *internal;
+    ao_au_internal *internal;
 
-	internal = (ao_au_internal *) malloc(sizeof(ao_au_internal));
+    internal = (ao_au_internal *) malloc(sizeof(ao_au_internal));
 
-	if (internal == NULL)
-		return 0; /* Could not initialize device memory */
+    if (internal == NULL)
+        return 0; /* Could not initialize device memory */
 
-	memset(&(internal->au), 0, sizeof(internal->au));
+    memset(&(internal->au), 0, sizeof(internal->au));
 
-	device->internal = internal;
+    device->internal = internal;
         device->output_matrix_order = AO_OUTPUT_MATRIX_FIXED;
 
-	return 1; /* Memory alloc successful */
+    return 1; /* Memory alloc successful */
 }
 
 
 static int ao_au_set_option(ao_device *device, const char *key,
-			    const char *value)
+                const char *value)
 {
-	return 1; /* No options! */
+    return 1; /* No options! */
 }
 
 
 static int ao_au_open(ao_device *device, ao_sample_format *format)
 {
-	ao_au_internal *internal = (ao_au_internal *) device->internal;
-	unsigned char buf[AU_HEADER_LEN];
+    ao_au_internal *internal = (ao_au_internal *) device->internal;
+    unsigned char buf[AU_HEADER_LEN];
 
-	/* The AU format is big-endian */
-	device->driver_byte_format = AO_FMT_BIG;
+    /* The AU format is big-endian */
+    device->driver_byte_format = AO_FMT_BIG;
 
-	/* Fill out the header */
-	internal->au.magic = AUDIO_FILE_MAGIC;
-	internal->au.channels = device->output_channels;
-	if (format->bits == 8)
-		internal->au.encoding = AUDIO_FILE_ENCODING_LINEAR_8;
-	else if (format->bits == 16)
-		internal->au.encoding = AUDIO_FILE_ENCODING_LINEAR_16;
-	else {
-		/* Only 8 and 16 bits are supported at present. */
-		return 0;
-	}
-	internal->au.sample_rate = format->rate;
-	internal->au.hdr_size = AU_HEADER_LEN;
+    /* Fill out the header */
+    internal->au.magic = AUDIO_FILE_MAGIC;
+    internal->au.channels = device->output_channels;
+    if (format->bits == 8)
+        internal->au.encoding = AUDIO_FILE_ENCODING_LINEAR_8;
+    else if (format->bits == 16)
+        internal->au.encoding = AUDIO_FILE_ENCODING_LINEAR_16;
+    else {
+        /* Only 8 and 16 bits are supported at present. */
+        return 0;
+    }
+    internal->au.sample_rate = format->rate;
+    internal->au.hdr_size = AU_HEADER_LEN;
 
-	/* From the AU specification:  "When audio files are passed
-	 * through pipes, the 'data_size' field may not be known in
-	 * advance.  In such cases, the 'data_size' should be set
-	 * to AUDIO_UNKNOWN_SIZE."
-	 */
-	internal->au.data_size = AUDIO_UNKNOWN_SIZE;
-	/* strncpy(state->au.info, "OGG ", 4); */
+    /* From the AU specification:  "When audio files are passed
+     * through pipes, the 'data_size' field may not be known in
+     * advance.  In such cases, the 'data_size' should be set
+     * to AUDIO_UNKNOWN_SIZE."
+     */
+    internal->au.data_size = AUDIO_UNKNOWN_SIZE;
+    /* strncpy(state->au.info, "OGG ", 4); */
 
-	/* Write the header in big-endian order */
-	WRITE_U32(buf, internal->au.magic);
-	WRITE_U32(buf + 4, internal->au.hdr_size);
-	WRITE_U32(buf + 8, internal->au.data_size);
-	WRITE_U32(buf + 12, internal->au.encoding);
-	WRITE_U32(buf + 16, internal->au.sample_rate);
-	WRITE_U32(buf + 20, internal->au.channels);
-	strncpy (buf + 24, internal->au.info, 4);
+    /* Write the header in big-endian order */
+    WRITE_U32(buf, internal->au.magic);
+    WRITE_U32(buf + 4, internal->au.hdr_size);
+    WRITE_U32(buf + 8, internal->au.data_size);
+    WRITE_U32(buf + 12, internal->au.encoding);
+    WRITE_U32(buf + 16, internal->au.sample_rate);
+    WRITE_U32(buf + 20, internal->au.channels);
+    strncpy (buf + 24, internal->au.info, 4);
 
-	if (fwrite(buf, sizeof(char), AU_HEADER_LEN, device->file)
-	    != AU_HEADER_LEN) {
-		return 0; /* Error writing header */
-	}
+    if (fwrite(buf, sizeof(char), AU_HEADER_LEN, device->file)
+        != AU_HEADER_LEN) {
+        return 0; /* Error writing header */
+    }
 
         if(!device->inter_matrix){
           /* set up matrix such that users are warned about > stereo playback */
@@ -177,7 +177,7 @@ static int ao_au_open(ao_device *device, ao_sample_format *format)
         }
 
 
-	return 1;
+    return 1;
 }
 
 
@@ -185,66 +185,66 @@ static int ao_au_open(ao_device *device, ao_sample_format *format)
  * play the sample to the already opened file descriptor
  */
 static int ao_au_play(ao_device *device, const char *output_samples,
-		       uint_32 num_bytes)
+               uint_32 num_bytes)
 {
-	if (fwrite(output_samples, sizeof(char), num_bytes,
-		   device->file) < num_bytes)
-		return 0;
-	else
-		return 1;
+    if (fwrite(output_samples, sizeof(char), num_bytes,
+           device->file) < num_bytes)
+        return 0;
+    else
+        return 1;
 }
 
 static int ao_au_close(ao_device *device)
 {
-	ao_au_internal *internal = (ao_au_internal *) device->internal;
+    ao_au_internal *internal = (ao_au_internal *) device->internal;
 
         off_t size;
-	unsigned char buf[4];
+    unsigned char buf[4];
 
-	/* Try to find the total file length, including header */
-	size = ftell(device->file);
+    /* Try to find the total file length, including header */
+    size = ftell(device->file);
 
-	/* It's not a problem if the lseek() fails; the AU
-	 * format does not require a file length.  This is
-	 * useful for writing to non-seekable files (e.g.
-	 * pipes).
-	 */
-	if (size > 0) {
-		internal->au.data_size = size - AU_HEADER_LEN;
+    /* It's not a problem if the lseek() fails; the AU
+     * format does not require a file length.  This is
+     * useful for writing to non-seekable files (e.g.
+     * pipes).
+     */
+    if (size > 0) {
+        internal->au.data_size = size - AU_HEADER_LEN;
 
-		/* Rewind the file */
-		if (fseek(device->file, 8 /* offset of data_size */,
-					SEEK_SET) < 0)
-		{
-			return 1; /* Seek failed; that's okay  */
-		}
+        /* Rewind the file */
+        if (fseek(device->file, 8 /* offset of data_size */,
+                    SEEK_SET) < 0)
+        {
+            return 1; /* Seek failed; that's okay  */
+        }
 
-		/* Fill in the file length */
-		WRITE_U32 (buf, internal->au.data_size);
-		if (fwrite(buf, sizeof(char), 4, device->file) < 4) {
-			return 1; /* Header write failed; that's okay */
-		}
-	}
+        /* Fill in the file length */
+        WRITE_U32 (buf, internal->au.data_size);
+        if (fwrite(buf, sizeof(char), 4, device->file) < 4) {
+            return 1; /* Header write failed; that's okay */
+        }
+    }
 
-	return 1;
+    return 1;
 }
 
 
 static void ao_au_device_clear(ao_device *device)
 {
-	ao_au_internal *internal = (ao_au_internal *) device->internal;
+    ao_au_internal *internal = (ao_au_internal *) device->internal;
 
-	free(internal);
+    free(internal);
         device->internal=NULL;
 }
 
 ao_functions ao_au = {
-	ao_au_test,
-	ao_au_driver_info,
-	ao_au_device_init,
-	ao_au_set_option,
-	ao_au_open,
-	ao_au_play,
-	ao_au_close,
-	ao_au_device_clear
+    ao_au_test,
+    ao_au_driver_info,
+    ao_au_device_init,
+    ao_au_set_option,
+    ao_au_open,
+    ao_au_play,
+    ao_au_close,
+    ao_au_device_clear
 };

@@ -60,7 +60,7 @@
 /* --- Structures --- */
 
 typedef struct ao_config {
-	char *default_driver;
+    char *default_driver;
 } ao_config;
 
 typedef enum {
@@ -71,19 +71,19 @@ typedef enum {
 } ao_outorder;
 
 struct ao_device {
-	int  type; /* live output or file output? */
-	int  driver_id;
-	ao_functions *funcs;
-	FILE *file; /* File for output if this is a file driver */
+    int  type; /* live output or file output? */
+    int  driver_id;
+    ao_functions *funcs;
+    FILE *file; /* File for output if this is a file driver */
 
   /* input not necessarily == output. Right now, byte order, channel
      count, and channel mappings may be altered. */
 
-	int  client_byte_format;
-	int  machine_byte_format;
-	int  driver_byte_format;
-	char *swap_buffer;
-	int  swap_buffer_size; /* Bytes allocated to swap_buffer */
+    int  client_byte_format;
+    int  machine_byte_format;
+    int  driver_byte_format;
+    char *swap_buffer;
+    int  swap_buffer_size; /* Bytes allocated to swap_buffer */
 
         int input_channels;
         int output_channels;
@@ -115,23 +115,23 @@ struct ao_device {
                                  inter_matrix back to an input channel
                                  (if any) */
 
-	void *internal;       /* Pointer to driver-specific data */
+    void *internal;       /* Pointer to driver-specific data */
 
         int verbose;
 };
 
 struct ao_functions {
-	int (*test)(void);
-	ao_info* (*driver_info)(void);
-	int (*device_init)(ao_device *device);
-	int (*set_option)(ao_device *device, const char *key,
-			  const char *value);
-	int (*open)(ao_device *device, ao_sample_format *format);
-	int (*play)(ao_device *device, const char *output_samples,
-			   uint_32 num_bytes);
-	int (*close)(ao_device *device);
-	void (*device_clear)(ao_device *device);
-	char* (*file_extension)(void);
+    int (*test)(void);
+    ao_info* (*driver_info)(void);
+    int (*device_init)(ao_device *device);
+    int (*set_option)(ao_device *device, const char *key,
+              const char *value);
+    int (*open)(ao_device *device, ao_sample_format *format);
+    int (*play)(ao_device *device, const char *output_samples,
+               uint_32 num_bytes);
+    int (*close)(ao_device *device);
+    void (*device_clear)(ao_device *device);
+    char* (*file_extension)(void);
 };
 
 /* --- Functions --- */

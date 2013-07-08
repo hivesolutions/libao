@@ -53,24 +53,24 @@ static char *trim(char *p){
 
 static int ao_read_config_file(ao_config *config, const char *config_file)
 {
-	FILE *fp;
-	char line[LINE_LEN];
-	int end;
+    FILE *fp;
+    char line[LINE_LEN];
+    int end;
 
-	if ( !(fp = fopen(config_file, "r")) )
-		return 0; /* Can't open file */
+    if ( !(fp = fopen(config_file, "r")) )
+        return 0; /* Can't open file */
 
-	while (fgets(line, LINE_LEN, fp)) {
-		/* All options are key=value */
+    while (fgets(line, LINE_LEN, fp)) {
+        /* All options are key=value */
 
-		if (strncmp(line, "default_driver=", 15) == 0) {
-			free(config->default_driver);
-			end = strlen(line);
-			if (line[end-1] == '\n')
-				line[end-1] = 0; /* Remove trailing newline */
+        if (strncmp(line, "default_driver=", 15) == 0) {
+            free(config->default_driver);
+            end = strlen(line);
+            if (line[end-1] == '\n')
+                line[end-1] = 0; /* Remove trailing newline */
 
-			config->default_driver = _strdup(line+15);
-		}else{
+            config->default_driver = _strdup(line+15);
+        }else{
                         /* entries in the config file that don't parse as
                            directives to AO at large are treated as driver
                            options */
@@ -84,28 +84,27 @@ static int ao_read_config_file(ao_config *config, const char *config_file)
                           ao_append_global_option(key,val);
                         }
                 }
-	}
+    }
 
-	fclose(fp);
+    fclose(fp);
 
-	return 1;
+    return 1;
 }
 
 void ao_read_config_files (ao_config *config)
 {
-	char userfile[FILENAME_MAX+1];
-	char *homedir = getenv("HOME");
+    char userfile[FILENAME_MAX+1];
+    char *homedir = getenv("HOME");
 
-	/* Read the system-wide config file */
-	ao_read_config_file(config, AO_SYSTEM_CONFIG);
+    /* Read the system-wide config file */
+    ao_read_config_file(config, AO_SYSTEM_CONFIG);
 
-	/* Read the user config file */
-	if ( homedir!=NULL &&
-	     strlen(homedir) <= FILENAME_MAX - strlen(AO_USER_CONFIG) )
-	{
-		strncpy(userfile, homedir, FILENAME_MAX);
-		strcat(userfile, AO_USER_CONFIG);
-		ao_read_config_file(config, userfile);
-	}
+    /* Read the user config file */
+    if ( homedir!=NULL &&
+         strlen(homedir) <= FILENAME_MAX - strlen(AO_USER_CONFIG) )
+    {
+        strncpy(userfile, homedir, FILENAME_MAX);
+        strcat(userfile, AO_USER_CONFIG);
+        ao_read_config_file(config, userfile);
+    }
 }
-

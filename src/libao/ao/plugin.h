@@ -1,7 +1,7 @@
 /*
  *
  *  plugin.h - function declarations for libao plugins
- *  
+ *
  *      Copyright (C) Stan Seibert - June 2001
  *
  *  This file is part of libao, a cross-platform audio outputlibrary.  See
@@ -29,7 +29,7 @@
 extern "C"
 {
 #endif /* __cplusplus */
-	
+
 #include <stdlib.h>
 #include "os_types.h"
 
@@ -38,8 +38,8 @@ ao_info *ao_plugin_driver_info();
 int ao_plugin_device_init(ao_device *device);
 int ao_plugin_set_option(ao_device *device, const char *key, const char *value);
 int ao_plugin_open(ao_device *device, ao_sample_format *format);
-int ao_plugin_play(ao_device *device, const char *output_samples, 
-		uint_32 num_bytes);
+int ao_plugin_play(ao_device *device, const char *output_samples,
+        uint_32 num_bytes);
 int ao_plugin_close(ao_device *device);
 void ao_plugin_device_clear(ao_device *device);
 char *ao_plugin_file_extension();

@@ -219,11 +219,11 @@ static int _ao_open_device(ao_device *device)
 
   mmres =
     waveOutOpen(&internal->hwo,
-		internal->id,
-		&internal->wavefmt.Format,
-		(DWORD_PTR)0/* waveOutProc */,
-		(DWORD_PTR)device,
-		CALLBACK_NULL/* |WAVE_FORMAT_DIRECT */|WAVE_ALLOWSYNC);
+        internal->id,
+        &internal->wavefmt.Format,
+        (DWORD_PTR)0/* waveOutProc */,
+        (DWORD_PTR)device,
+        CALLBACK_NULL/* |WAVE_FORMAT_DIRECT */|WAVE_ALLOWSYNC);
 
   if(mmres == MMSYSERR_NOERROR){
     adebug("waveOutOpen id=%d, channels=%d, bits=%d, rate %d => SUCCESS\n",
@@ -294,7 +294,7 @@ static int _ao_alloc_wave_headers(ao_device *device)
       internal->wh[i].wh.dwBufferLength = internal->wh[i].length;
       internal->wh[i].wh.dwUser = (DWORD_PTR)device;
       mmres = waveOutPrepareHeader(internal->hwo,
-				   &internal->wh[i].wh,sizeof(WAVEHDR));
+                   &internal->wh[i].wh,sizeof(WAVEHDR));
       if (MMSYSERR_NOERROR != mmres) {
         aerror("waveOutPrepareHeader(%d) => %s\n",i, mmerror(mmres));
         break;
@@ -303,7 +303,7 @@ static int _ao_alloc_wave_headers(ao_device *device)
     if (i<internal->blocks) {
       while (--i >= 0) {
         waveOutUnprepareHeader(internal->hwo,
-			       &internal->wh[i].wh,sizeof(WAVEHDR));
+                   &internal->wh[i].wh,sizeof(WAVEHDR));
       }
       free(internal->bigbuffer);
       internal->wh        = 0;
@@ -374,7 +374,7 @@ static int _ao_free_wave_headers(ao_device *device)
 
     for (i=internal->blocks; --i>=0; ) {
       mmres = waveOutUnprepareHeader(internal->hwo,
-				     &internal->wh[i].wh,sizeof(WAVEHDR));
+                     &internal->wh[i].wh,sizeof(WAVEHDR));
       if (mmres != MMSYSERR_NOERROR)
         aerror("waveOutUnprepareHeader(%d) => %s\n", i, mmerror(mmres));
 
@@ -504,7 +504,7 @@ static int _ao_send_block(ao_device *device, const int idx)
   internal->wh[idx].wh.dwBufferLength = internal->wh[idx].count;
   internal->wh[idx].count = 0;
   mmres = waveOutWrite(internal->hwo,
-		       &internal->wh[idx].wh, sizeof(WAVEHDR));
+               &internal->wh[idx].wh, sizeof(WAVEHDR));
   internal->wh[idx].sent = (mmres == MMSYSERR_NOERROR);
   /*&& !(internal->wh[idx].wh.dwFlags & WHDR_DONE);*/
   internal->sent_blocks += internal->wh[idx].sent;
@@ -576,8 +576,8 @@ int ao_wmm_play(ao_device *device,
 
     /* Do copy */
     CopyMemory((char*)internal->wh[idx].wh.lpData
-	       + internal->wh[idx].count,
-	       output_samples, n);
+           + internal->wh[idx].count,
+           output_samples, n);
 
     /* Updates pointers and counters */
     output_samples += n;
@@ -586,10 +586,10 @@ int ao_wmm_play(ao_device *device,
 
     /* Is this block full ? */
     if (internal->wh[idx].count
-	== internal->wh[idx].wh.dwBufferLength) {
+    == internal->wh[idx].wh.dwBufferLength) {
       ++internal->full_blocks;
       if (++internal->widx == internal->blocks) {
-	internal->widx = 0;
+    internal->widx = 0;
       }
       ret = _ao_send_block(device,idx);
     }

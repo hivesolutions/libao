@@ -135,11 +135,11 @@ int ao_aixs_set_option(ao_device *device, const char *key, const char *value)
 
 int ao_aixs_open(ao_device *device, ao_sample_format *format)
 {
-	ao_aixs_internal *internal = (ao_aixs_internal *) device->internal;
+    ao_aixs_internal *internal = (ao_aixs_internal *) device->internal;
 
-	audio_init init;
-	audio_control control;
-	audio_change change;
+    audio_init init;
+    audio_control control;
+    audio_change change;
 
         if(!internal->dev){
           char buffer[80];
@@ -162,42 +162,42 @@ int ao_aixs_open(ao_device *device, ao_sample_format *format)
           if ( (internal->fd = open(internal->dev, O_WRONLY)) < 0 )
             return 0;
 
-	init.srate = format->rate;
-	init.bits_per_sample = format->bits;
-	init.channels = device->output_channels;
-	init.mode = AUDIO_PCM;
-	init.flags = AUDIO_BIG_ENDIAN | AUDIO_TWOS_COMPLEMENT;
-	init.operation = AUDIO_PLAY;
+    init.srate = format->rate;
+    init.bits_per_sample = format->bits;
+    init.channels = device->output_channels;
+    init.mode = AUDIO_PCM;
+    init.flags = AUDIO_BIG_ENDIAN | AUDIO_TWOS_COMPLEMENT;
+    init.operation = AUDIO_PLAY;
 
- 	if (ioctl(internal->fd, AUDIO_INIT, &init) < 0) {
-		close(internal->fd);
-		return 0;  /* Unsupported audio format */
-	}
+     if (ioctl(internal->fd, AUDIO_INIT, &init) < 0) {
+        close(internal->fd);
+        return 0;  /* Unsupported audio format */
+    }
 
-	change.balance = 0x3fff0000;
-	change.volume = 0x3fff0000;
-	change.monitor = AUDIO_IGNORE;
-	change.input = AUDIO_IGNORE;
-	change.output = AUDIO_OUTPUT_1;
+    change.balance = 0x3fff0000;
+    change.volume = 0x3fff0000;
+    change.monitor = AUDIO_IGNORE;
+    change.input = AUDIO_IGNORE;
+    change.output = AUDIO_OUTPUT_1;
 
-	control.ioctl_request = AUDIO_CHANGE;
-	control.position = 0;
-	control.request_info = &change;
+    control.ioctl_request = AUDIO_CHANGE;
+    control.position = 0;
+    control.request_info = &change;
 
-	if (ioctl(internal->fd, AUDIO_CONTROL, &control) < 0) {
-		close(internal->fd);
-		return 0;
-	}
+    if (ioctl(internal->fd, AUDIO_CONTROL, &control) < 0) {
+        close(internal->fd);
+        return 0;
+    }
 
-	control.ioctl_request = AUDIO_START;
-	control.request_info = NULL;
+    control.ioctl_request = AUDIO_START;
+    control.request_info = NULL;
 
-	if (ioctl(internal->fd, AUDIO_CONTROL, &control) < 0) {
-		close(internal->fd);
-		return 0;
-	}
+    if (ioctl(internal->fd, AUDIO_CONTROL, &control) < 0) {
+        close(internal->fd);
+        return 0;
+    }
 
-	device->driver_byte_format = AO_FMT_NATIVE;
+    device->driver_byte_format = AO_FMT_NATIVE;
         if(!device->inter_matrix){
           /* set up matrix such that users are warned about > stereo playback */
           if(device->output_channels<=2)
@@ -205,52 +205,52 @@ int ao_aixs_open(ao_device *device, ao_sample_format *format)
           //else no matrix, which results in a warning
         }
 
-	return 1;
+    return 1;
 }
 
 
 int ao_aixs_play(ao_device *device, const char *output_samples,
-		uint_32 num_bytes)
+        uint_32 num_bytes)
 {
-	ao_aixs_internal *internal = (ao_aixs_internal *) device->internal;
+    ao_aixs_internal *internal = (ao_aixs_internal *) device->internal;
 
-	if (write(internal->fd, output_samples, num_bytes) < 0)
-		return 0;
-	else
-		return 1;
+    if (write(internal->fd, output_samples, num_bytes) < 0)
+        return 0;
+    else
+        return 1;
 }
 
 
 int ao_aixs_close(ao_device *device)
 {
-	ao_aixs_internal *internal = (ao_aixs_internal *) device->internal;
+    ao_aixs_internal *internal = (ao_aixs_internal *) device->internal;
 
         if(internal->fd)
           close(internal->fd);
         internal->fd=-1;
-	return 1;
+    return 1;
 }
 
 
 void ao_aixs_device_clear(ao_device *device)
 {
-	ao_aixs_internal *internal = (ao_aixs_internal *) device->internal;
+    ao_aixs_internal *internal = (ao_aixs_internal *) device->internal;
 
         if(internal->dev)
           free(internal->dev);
-	free(internal);
+    free(internal);
         device->internal = NULL;
 }
 
 ao_functions ao_aixs = {
-	ao_aixs_test,
-	ao_aixs_driver_info,
-	ao_aixs_device_init,
-	ao_aixs_set_option,
-	ao_aixs_open,
-	ao_aixs_play,
-	ao_aixs_close,
-	ao_aixs_device_clear
+    ao_aixs_test,
+    ao_aixs_driver_info,
+    ao_aixs_device_init,
+    ao_aixs_set_option,
+    ao_aixs_open,
+    ao_aixs_play,
+    ao_aixs_close,
+    ao_aixs_device_clear
 };
 
 #endif
